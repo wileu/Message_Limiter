@@ -1,59 +1,21 @@
-[{
-  "id":"b660e882.34e968",
-  "type":"function",
-  "z":"bc0c9481.a3cae8",
-  "name":"Message Limiter",
-  "func":"
-  
-    var secs = 30; // interwal w sekundach  
-    var mins = 0;  // minutach
-    var hours = 0; // godzinach
-    var count = 2; // ile wiadomości/interwał
-    var perTopic = true; // msg.topic/interwał (true), czy msg/interwał (false)
-    //-----------------------------
-    var message;
-  
-    (perTopic) ? message = msg.topic : message = \"foo\"
-    secs = 1000*secs;
-    mins = 60000*mins;
-    hours = 3600000*hours;
-    var interval = secs+mins+hours;
-    
-    if(!context.map){
-      var map = new Map();
-      context.map = map;
+[
+    {
+        "id": "b660e882.34e968",
+        "type": "function",
+        "z": "bc0c9481.a3cae8",
+        "name": "Message Limiter",
+        "func": "var secs = 30; // interwal w sekundach\nvar mins = 0;  // minutach\nvar hours = 0; // godzinach\n\nvar count = 2; // ile wiadomości/interwał\nvar perTopic = true; // msg.topic/interwał (true), czy msg/interwał (false)\n\n//-----------------------------\n\nvar message;\n(perTopic) ? message = msg.topic : message = \"foo\"\n\nsecs = 1000*secs;\nmins = 60000*mins;\nhours = 3600000*hours;\nvar interval = secs+mins+hours;\n\nif(!context.map){\n    var map = new Map();\n    context.map = map;\n}\n\nvar assoc = context.map;\nvar now = Date.now();\n\nif(assoc.get(message) === undefined){\n    assoc.set(message, [now,2]);\n    msg.debug1 = assoc.get(message)[1];\n    return msg;\n} else {\n    \n    if(now - (assoc.get(message)[0]) > interval){\n        assoc.get(message)[0] = now;\n        assoc.get(message)[1] = 2;\n        msg.debug2 = assoc.get(message)[1];\n        return msg;\n    }\n    \n    if ( count >= assoc.get(message)[1] && (now - (assoc.get(message)[0]) < interval)) {\n        msg.debug3 = assoc.get(message)[1];\n        assoc.get(message)[1] = assoc.get(message)[1] + 1;\n        return msg;\n    }    \n    return null;\n}\n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is deployed.\n//var map = new Map();\n//context.map = map;",
+        "finalize": "",
+        "x": 550,
+        "y": 265,
+        "wires": [
+            [
+                "9787eff7.dbf268",
+                "62af74b7.2da5f4"
+            ]
+        ]
     }
- 
-    var assoc = context.map;
-    var now = Date.now();
-    
-    if(assoc.get(message) === undefined){
-      assoc.set(message, [now,2]);
-      msg.debug1 = assoc.get(message)[1];
-      return msg;
-    } else {
-        if(now - (assoc.get(message)[0]) > interval){
-          assoc.get(message)[0] = now;
-          assoc.get(message)[1] = 2;
-          msg.debug2 = assoc.get(message)[1];
-          return msg;
-        }
-       
-         if( count >= assoc.get(message)[1] && (now - (assoc.get(message)[0]) < interval)){
-           msg.debug3 = assoc.get(message)[1];
-           assoc.get(message)[1] = assoc.get(message)[1] + 1;
-           return msg;
-         }    
-  return null;
-  }",
-
- "outputs":1,
- "noerr":0,
- "initialize":"// Code added here will be run once
- // whenever the node is deployed.
- //var map = new Map();
- //context.map = map;",
- "finalize":"",
- "x":550,
- "y":265,
- "wires":[["9787eff7.dbf268","62af74b7.2da5f4"]]}]
+]
